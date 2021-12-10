@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Wallpaper App</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">@string/app_name</string>
+    <string name="title_favourite">Favorit</string>
+    <string name="title_setting">Pengaturan</string>
+    <string name="wallpaper_image">wallpaper image</string>
+    <string name="gunakan_wallpaper">Gunakan Wallpaper</string>
+
+
+    <string name="general_inet_exception">Maaf, ada masalah pada koneksi anda</string>
+    <string name="redirect_response_exception">@string/general_inet_exception</string>
+    <string name="client_request_exception">@string/general_inet_exception</string>
+    <string name="server_response_exception">@string/general_inet_exception</string>
+    <string name="request_timeout_exception">@string/general_inet_exception</string>
+    <string name="unresolved_address_exception">@string/general_inet_exception</string>
+</resources>

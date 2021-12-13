@@ -13,11 +13,13 @@ import com.ahsailabs.wallpaperapp.DetailActivity
 import com.ahsailabs.wallpaperapp.databinding.FragmentHomeBinding
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.ahsailabs.wallpaperapp.data.ApiService
 import com.ahsailabs.wallpaperapp.data.repositories.WallpaperRepository
 import com.ahsailabs.wallpaperapp.data.sources.WallpaperRemoteSource
 import com.ahsailabs.wallpaperapp.domain.models.response.Photo
 import com.ahsailabs.wallpaperapp.domain.usecases.HomeUseCase
+import com.ahsailabs.wallpaperapp.lib.EndlessRecyclerViewScrollListener
 import com.ahsailabs.wallpaperapp.lib.ProcessState
 import com.ahsailabs.wallpaperapp.lib.createWithFactory
 import kotlinx.coroutines.flow.launchIn
@@ -62,7 +64,8 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.rvHome.layoutManager = GridLayoutManager(view.context,2)
+        val layoutManager = GridLayoutManager(view.context,2)
+        binding.rvHome.layoutManager = layoutManager
         homeAdapter = HomeAdapter(view.context,data, object : OnItemClickListener {
             override fun onItemClick(imageView: ImageView, photo: Photo) {
                 val detailActivity = Intent(view.context, DetailActivity::class.java)
@@ -74,12 +77,13 @@ class HomeFragment : Fragment() {
         })
         binding.rvHome.adapter = homeAdapter
 
-        /*
-        homeViewModel.wallpapers.observe(viewLifecycleOwner, Observer {
-            data.addAll(it)
-            homeAdapter?.notifyItemRangeChanged(0,it.size)
-        })
-        */
+        val onScrollListener = object : EndlessRecyclerViewScrollListener(layoutManager) {
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
+                homeViewModel.searchWallpapers("nature", page)
+            }
+        }
+        binding.rvHome.addOnScrollListener(onScrollListener)
+
 
         homeViewModel.homeState.getStateFlow().onEach {
             when (it) {
@@ -90,17 +94,21 @@ class HomeFragment : Fragment() {
                     showLoading()
                 }
                 is ProcessState.Success -> {
-                    data.addAll(it.data)
-                    homeAdapter?.notifyItemRangeChanged(0,it.data.size)
+                    val prevSize = data.size
+                    data.addAll(it.data.photos!!)
+                    homeAdapter?.notifyItemRangeChanged(prevSize,it.data.photos.size)
                     hideLoading()
+                    if(it.data.nextPage.isNullOrEmpty()){
+                        
+                    }
                 }
                 is ProcessState.Error -> {
                     hideLoading()
                 }
             }
-        }.launchIn(lifecycleScope)
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-        homeViewModel.searchWallpapers("nature")
+        homeViewModel.searchWallpapers("nature", 1)
     }
 
     private fun showLoading(){

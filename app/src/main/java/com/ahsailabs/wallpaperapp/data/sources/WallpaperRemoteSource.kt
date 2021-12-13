@@ -11,12 +11,12 @@ import io.ktor.client.request.*
 class WallpaperRemoteSource(httpClient: HttpClient) {
     private val api: HttpClient = httpClient
 
-    suspend fun search(query: String, limit: Int): SearchResponse {
+    suspend fun search(query: String?, page: Int?, limit: Int?): SearchResponse {
         return api.get(ApiService.searchUrl){
             parameter("query", query)
-            parameter("orientation", "portrait")
-            parameter("page", 1)
+            parameter("page", page)
             parameter("per_page", limit)
+            parameter("orientation", "portrait")
         }
     }
 

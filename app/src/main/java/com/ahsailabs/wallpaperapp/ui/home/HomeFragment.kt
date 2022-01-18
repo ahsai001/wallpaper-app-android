@@ -1,5 +1,6 @@
 package com.ahsailabs.wallpaperapp.ui.home
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -109,6 +110,10 @@ class HomeFragment : Fragment() {
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         homeViewModel.searchWallpapers("nature", 1)
+
+
+        val sharedPrefs = activity?.getPreferences(Context.MODE_PRIVATE)
+        sharedPrefs?.edit()?.putBoolean("change_ui_mode", true)?.apply()
     }
 
     private fun showLoading(){

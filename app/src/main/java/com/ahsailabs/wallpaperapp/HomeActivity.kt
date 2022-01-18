@@ -1,5 +1,7 @@
 package com.ahsailabs.wallpaperapp
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -36,9 +38,18 @@ class HomeActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             binding.toolbarTitle.text = destination.label
         }
-
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        val sharedPrefs = getPreferences(Context.MODE_PRIVATE)
+        if(sharedPrefs.getBoolean("change_ui_mode", false)){
+            binding.navView.selectedItemId = R.id.navigation_setting
+            sharedPrefs.edit().putBoolean("change_ui_mode", false).apply()
+        }
+    }
+
 }
